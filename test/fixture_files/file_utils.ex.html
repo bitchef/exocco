@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>file_utils.ex</title>
+<link rel="stylesheet" href="./tmp/exocco.css" type="text/css" media="screen"/>
+</head>
+<body>
+<page>
+<nav role="navigation">
+<ul class="menu">
+<li class="dropdown">
+<a href="javascript:void(0);"><span class="large">Jump To&hellip;</span><span class="small">+</span></a>
+<ul class="dropdown-menu" role="menu">
+<li><a href="./../tmp/exocco.ex.html">exocco.ex</a></li><li><a href="./../tmp/file_utils.ex.html">file_utils.ex</a></li></ul><!-- end dropdown-menu -->
+</li><!-- end dropdown -->
+</ul><!-- end menu -->
+</nav>
+
+<content>
+<ul class="sections"> 
+<li id="title">
+<div class="annotation"> 
+<h1>file_utils.ex</h1>
+</div>
+</li><!-- end #title -->
+<li id="section-0 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-0">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre><span class="k">defmodule</span> <span class="no">FileUtils</span> <span class="k">do</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-0 -->
+<li id="section-1 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-1">&#182;</a>
+</div>
+<p>List files at the first level of a directory (or a list of directories).</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="nv">@spec</span> <span class="n">list_files</span><span class="p">(</span><span class="n">path</span> <span class="p">::</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span> <span class="o">|</span> <span class="p">[</span><span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">])</span> <span class="p">::</span> <span class="p">[</span><span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="n">list_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_bitstring</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">list_files</span><span class="p">([</span><span class="n">path</span><span class="p">])</span>
+  <span class="k">def</span> <span class="n">list_files</span><span class="p">(</span><span class="n">pathList</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_list</span><span class="p">(</span><span class="n">pathList</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">list_files</span><span class="p">(</span><span class="n">pathList</span><span class="p">,</span> <span class="p">[])</span> <span class="o">|&gt;</span> <span class="n">remove_dirs</span>
+
+  <span class="k">defp</span> <span class="n">list_files</span><span class="p">([],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">sort</span> <span class="n">acc</span>
+  <span class="k">defp</span> <span class="n">list_files</span><span class="p">([</span><span class="n">path</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">      cond</span> <span class="k">do</span>
+<span class="k">        </span><span class="n">is_dir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span>  <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="n">files</span><span class="p">}</span>  <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-1 -->
+<li id="section-2 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-2">&#182;</a>
+</div>
+<p>Filter out hidden files and prepend filenames with their relative path.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="n">files</span> <span class="o">=</span> <span class="no">Enum</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="k">fn</span> <span class="n">filename</span> <span class="o">-&gt;</span> <span class="o">!</span><span class="no">String</span><span class="o">.</span><span class="n">starts_with?</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">fn</span> <span class="n">filename</span> <span class="o">-&gt;</span>  <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+        <span class="n">list_files</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">acc</span> <span class="o">++</span> <span class="n">files</span><span class="p">)</span>
+        <span class="n">is_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list_files</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[</span><span class="n">path</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+        <span class="no">true</span> <span class="o">-&gt;</span> <span class="n">list_files</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+      <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#list_files</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-2 -->
+<li id="section-3 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-3">&#182;</a>
+</div>
+<p>Recursively list files in a directory and its subdirectories.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="nv">@spec</span> <span class="n">list_files_r</span><span class="p">(</span><span class="n">path</span> <span class="p">::</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span> <span class="o">|</span> <span class="p">[</span><span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">])</span> <span class="p">::</span> <span class="p">[</span><span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="n">list_files_r</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_bitstring</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">list_files_r</span><span class="p">([</span><span class="n">path</span><span class="p">])</span>
+  <span class="k">def</span> <span class="n">list_files_r</span><span class="p">(</span><span class="n">pathList</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_list</span><span class="p">(</span><span class="n">pathList</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">list_files_r</span><span class="p">(</span><span class="n">pathList</span><span class="p">,</span> <span class="p">[])</span> <span class="o">|&gt;</span> <span class="n">remove_dirs</span>
+
+  <span class="k">defp</span> <span class="n">list_files_r</span><span class="p">([],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">sort</span> <span class="n">acc</span>
+  <span class="k">defp</span> <span class="n">list_files_r</span><span class="p">([</span><span class="n">path</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    cond</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">is_dir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">files</span> <span class="o">=</span> <span class="n">list_files</span><span class="p">([</span><span class="n">path</span><span class="p">],</span> <span class="p">[])</span>
+      <span class="n">list_files_r</span><span class="p">(</span><span class="n">next</span> <span class="o">++</span> <span class="n">files</span> <span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+      <span class="n">is_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">list_files_r</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[</span><span class="n">path</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+      <span class="no">true</span> <span class="o">-&gt;</span>  <span class="n">list_files_r</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#list_files_r</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-3 -->
+<li id="section-4 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-4">&#182;</a>
+</div>
+<h2>Helper functions</h2>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-4 -->
+<li id="section-5 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-5">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">def</span> <span class="n">is_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">regular?</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+  <span class="k">def</span> <span class="n">is_dir</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">dir?</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+  <span class="k">defp</span> <span class="n">remove_dirs</span><span class="p">(</span><span class="n">pathList</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pathList</span><span class="p">,</span> <span class="k">fn</span> <span class="n">path</span> <span class="o">-&gt;</span> <span class="n">is_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+<span class="k">end</span> <span class="c1">#defmodule FileUtils</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-5 -->
+</ul> <!-- end sections -->
+</content>
+</page>
+<script type="text/javascript" src="./../tmp/jquery.min.js"></script><script type="text/javascript" src="./../tmp/dropdown.js"></script>
+</body>
+</html>

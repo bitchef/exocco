@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>exocco.ex</title>
+<link rel="stylesheet" href="./tmp/exocco.css" type="text/css" media="screen"/>
+</head>
+<body>
+<page>
+
+<content>
+<ul class="sections"> 
+<li id="title">
+<div class="annotation"> 
+<h1>exocco.ex</h1>
+</div>
+</li><!-- end #title -->
+<li id="section-0 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-0">&#182;</a>
+</div>
+<p><strong>Exocco</strong> is an Elixir port of <a href="http://jashkenas.github.com/docco/">Docco</a>:
+the original quick-and-dirty, hundred-line-long, literate-programming-style
+documentation generator. It produces HTML that displays your comments
+alongside your code. Comments are passed through
+<a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a> while code is
+passed through <a href="http://pygments.org/">Pygments</a> for syntax highlighting.
+This page is the result of running Exocco against its own source file.</p>
+
+<p><code>exocco</code> is a self contained elixir script. You can run it from the command line as follow:</p>
+
+<pre><code>exocco lib/foo.ex
+</code></pre>
+
+<p>...or</p>
+
+<pre><code>exocco lib/
+</code></pre>
+
+<p>This will generate linked HTML documentation for the named source files (or first level files
+in a directory), saving it into a folder.</p>
+
+<p>To get more information about the available options, run:</p>
+
+<pre><code>exocco --help
+</code></pre>
+
+<p><strong>Exocco</strong> is available on <a href="https://github.com/bitchef/exocco">GitHub</a>.</p>
+
+<p>To build Exocco:</p>
+
+<p>Install <a href="http://elixir-lang.org/">Elixir</a>...</p>
+
+<p>grab the latest Exocco source...</p>
+
+<pre><code>git clone git://github.com/bitchef/exocco.git
+</code></pre>
+
+<p>and build the project:</p>
+<pre><code>cd exocco
+mix escript.build
+</code></pre>
+
+<p><strong>Exocco</strong> is released under the MIT License.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre><span class="k">defmodule</span> <span class="no">Exocco</span> <span class="k">do</span>
+<span class="k">  </span><span class="kn">require</span> <span class="no">Resources</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-0 -->
+<li id="section-1 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-1">&#182;</a>
+</div>
+<h3>Structs &amp; Macros</h3>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-1 -->
+<li id="section-2 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-2">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defmodule</span> <span class="no">Section</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">defstruct</span> <span class="ss">docText:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="ss">codeText:</span> <span class="s2">&quot;&quot;</span>
+    <span class="nv">@type</span> <span class="n">t</span> <span class="p">::</span> <span class="err">%</span><span class="no">Section</span><span class="p">{</span><span class="ss">docText:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">codeText:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">}</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-2 -->
+<li id="section-3 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-3">&#182;</a>
+</div>
+<p><code>Exocco.document/2</code> supported options.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defmodule</span> <span class="no">Document</span><span class="o">.</span><span class="no">Opts</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">defstruct</span> <span class="ss">output_dir:</span> <span class="s2">&quot;docs/&quot;</span><span class="p">,</span> <span class="ss">preserve_paths:</span> <span class="no">false</span><span class="p">,</span> <span class="ss">css:</span> <span class="no">nil</span>
+    <span class="nv">@type</span> <span class="n">t</span> <span class="p">::</span> <span class="err">%</span><span class="no">Document</span><span class="o">.</span><span class="no">Opts</span><span class="p">{</span><span class="ss">output_dir:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">preserve_paths:</span> <span class="n">boolean</span><span class="p">,</span> <span class="ss">css:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="k">defmacrop</span> <span class="n">mHighlightStart</span> <span class="k">do</span>
+<span class="k">    </span><span class="kn">quote</span> <span class="k">do</span>
+<span class="k">      </span><span class="s2">&quot;&lt;div class=\&quot;</span><span class="n">highlight</span><span class="p">\</span><span class="s2">&quot;&gt;&lt;pre&gt;&quot;</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+  <span class="k">defmacrop</span> <span class="n">mHighlightEnd</span> <span class="k">do</span>
+<span class="k">    </span><span class="kn">quote</span> <span class="k">do</span>
+<span class="k">      </span><span class="s2">&quot;&lt;/pre&gt;&lt;/div&gt;&quot;</span>
+    <span class="k">end</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-3 -->
+<li id="section-4 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-4">&#182;</a>
+</div>
+<p><strong>Pygments</strong> command line interface.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defmacrop</span> <span class="n">mPygmentize</span> <span class="k">do</span>
+<span class="k">  </span><span class="kn">quote</span> <span class="k">do</span>
+<span class="k">    </span><span class="s2">&quot;pygmentize&quot;</span>
+  <span class="k">end</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-4 -->
+<li id="section-5 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-5">&#182;</a>
+</div>
+<p><strong>Pygments</strong> web service URL.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defmacrop</span> <span class="n">mPygmentizeUrl</span> <span class="k">do</span>
+<span class="k">    </span><span class="kn">quote</span> <span class="k">do</span>
+<span class="k">      </span><span class="s1">&#39;http://pygments.appspot.com/&#39;</span>
+    <span class="k">end</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-5 -->
+<li id="section-6 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-6">&#182;</a>
+</div>
+<h2>Processing source files</h2>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-6 -->
+<li id="section-7 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-7">&#182;</a>
+</div>
+<p>Generate HTML documentation for each file in  a list of source files.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="nv">@spec</span> <span class="n">document</span><span class="p">(</span><span class="n">fileList</span> <span class="p">::</span> <span class="p">[</span><span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">],</span> <span class="n">opts</span> <span class="p">::</span> <span class="p">[</span><span class="no">Keyword</span><span class="o">.</span><span class="n">t</span><span class="p">])</span> <span class="p">::</span> <span class="n">none</span>
+  <span class="k">def</span> <span class="n">document</span><span class="p">(</span><span class="n">fileList</span><span class="p">,</span> <span class="n">opts</span> <span class="p">\\</span> <span class="p">[])</span>
+
+  <span class="k">def</span> <span class="n">document</span><span class="p">([],</span> <span class="n">_opts</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="ss">:ok</span>
+  <span class="k">def</span> <span class="n">document</span><span class="p">(</span><span class="n">fileList</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span> <span class="ow">when</span> <span class="n">is_list</span><span class="p">(</span><span class="n">fileList</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_list</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">opts</span> <span class="o">=</span> <span class="n">struct</span><span class="p">(</span><span class="no">Document</span><span class="o">.</span><span class="no">Opts</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="n">ensure_directory</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+
+    <span class="k">case</span> <span class="n">opts</span><span class="o">.</span><span class="n">css</span> <span class="k">do</span>
+<span class="k">      </span><span class="no">nil</span> <span class="o">-&gt;</span> <span class="n">cssDest</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;exocco.css&quot;</span><span class="p">)</span>
+      <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cssDest</span><span class="p">,</span> <span class="no">Resources</span><span class="o">.</span><span class="n">css</span><span class="p">)</span>
+
+      <span class="n">csspath</span> <span class="o">-&gt;</span>  <span class="n">cssDest</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="no">Path</span><span class="o">.</span><span class="n">basename</span> <span class="n">csspath</span><span class="p">)</span>
+      <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="n">csspath</span><span class="p">,</span> <span class="n">cssDest</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">jquery</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;jquery.min.js&quot;</span><span class="p">)</span>
+    <span class="n">dropdownjs</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;dropdown.js&quot;</span><span class="p">)</span>
+    <span class="n">scripts</span> <span class="o">=</span> <span class="p">[</span><span class="n">jquery</span><span class="p">,</span> <span class="n">dropdownjs</span><span class="p">]</span>
+
+    <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jquery</span><span class="p">,</span> <span class="no">Resources</span><span class="o">.</span><span class="n">jquery</span><span class="p">)</span>
+    <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dropdownjs</span><span class="p">,</span> <span class="no">Resources</span><span class="o">.</span><span class="n">dropdownjs</span><span class="p">)</span>
+
+
+    <span class="k">case</span> <span class="n">fileList</span> <span class="k">do</span>
+<span class="k">      </span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">document</span><span class="p">([</span><span class="n">filename</span><span class="p">],</span> <span class="p">[],</span> <span class="n">cssDest</span><span class="p">,</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">preserve_paths</span><span class="p">)</span>
+      <span class="n">files</span> <span class="o">-&gt;</span> <span class="n">jumps</span> <span class="o">=</span> <span class="n">build_nav_entries</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">preserve_paths</span><span class="p">)</span>
+      <span class="n">document</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">jumps</span><span class="p">,</span> <span class="n">cssDest</span><span class="p">,</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">preserve_paths</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#document</span>
+
+  <span class="k">defp</span> <span class="n">document</span><span class="p">([],</span> <span class="n">_jumps</span><span class="p">,</span> <span class="n">_cssDest</span><span class="p">,</span> <span class="n">_scripts</span><span class="p">,</span> <span class="n">_output</span><span class="p">,</span> <span class="n">_preservePaths</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="ss">:ok</span>
+  <span class="k">defp</span> <span class="n">document</span><span class="p">([</span><span class="n">file</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">jumps</span><span class="p">,</span> <span class="n">cssDest</span><span class="p">,</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">outputFile</span> <span class="o">=</span> <span class="n">destination</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">)</span>
+    <span class="n">dropdownLinks</span> <span class="o">=</span> <span class="k">case</span> <span class="n">jumps</span> <span class="k">do</span>
+<span class="k">      </span><span class="p">[]</span> <span class="o">-&gt;</span> <span class="s2">&quot;&quot;</span>
+      <span class="p">[</span><span class="n">_jump</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="s2">&quot;&quot;</span>
+      <span class="n">jumpList</span> <span class="o">-&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">jumpList</span><span class="p">,</span> <span class="k">fn</span> <span class="p">{</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="n">filename</span><span class="p">,</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)}</span> <span class="k">end</span><span class="p">)</span>
+      <span class="o">|&gt;</span> <span class="n">render_nav_links</span>
+    <span class="k">end</span>
+
+    <span class="n">csspath</span> <span class="o">=</span> <span class="k">cond</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">preservePaths</span> <span class="o">-&gt;</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">cssDest</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span>
+      <span class="no">true</span> <span class="o">-&gt;</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">cssDest</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="n">scriptLinks</span> <span class="o">=</span> <span class="no">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">scripts</span><span class="p">,</span> <span class="k">fn</span> <span class="n">script</span> <span class="o">-&gt;</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="n">render_js_scripts</span>
+
+    <span class="n">lang</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">extname</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Language</span><span class="o">.</span><span class="n">from_file_ext</span>
+    <span class="k">if</span> <span class="n">lang</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">build_document</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">,</span> <span class="n">csspath</span><span class="p">,</span> <span class="n">dropdownLinks</span><span class="p">,</span> <span class="n">scriptLinks</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="no">IO</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;Error: could not determine language for: &#39;</span><span class="si">#{</span><span class="n">file</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+    <span class="k">end</span>
+
+    <span class="n">document</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">jumps</span><span class="p">,</span> <span class="n">cssDest</span><span class="p">,</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">)</span>
+  <span class="k">end</span> <span class="c1">#document</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-7 -->
+<li id="section-8 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-8">&#182;</a>
+</div>
+<h2>Building HTML document</h2>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-8 -->
+<li id="section-9 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-9">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">build_document</span><span class="p">(</span><span class="n">sourceFile</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">cssDest</span><span class="p">,</span> <span class="n">dropdownLinks</span><span class="p">,</span> <span class="n">scriptLinks</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">ensure_directory</span><span class="p">(</span><span class="no">Path</span><span class="o">.</span><span class="n">dirname</span> <span class="n">dest</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">read_source</span><span class="p">(</span><span class="n">sourceFile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lang</span><span class="o">.</span><span class="n">literate</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">lines</span> <span class="o">=</span> <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+    <span class="n">processedSections</span> <span class="o">=</span> <span class="n">process_sections</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">sections</span><span class="p">)</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">sourceFile</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="n">render_template</span><span class="p">(</span><span class="n">cssDest</span><span class="p">,</span> <span class="n">processedSections</span><span class="p">,</span> <span class="n">dropdownLinks</span><span class="p">,</span> <span class="n">scriptLinks</span><span class="p">)</span>
+    <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">html</span><span class="p">)</span>
+    <span class="no">IO</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;exocco </span><span class="si">#{</span><span class="n">sourceFile</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">#{</span><span class="n">dest</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="k">end</span> <span class="c1">#build_document</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-9 -->
+<li id="section-10 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-10">&#182;</a>
+</div>
+<p>Parse lines of a source file into a list of sections. Each section will be of the form:</p>
+<pre><code>{"codeText": ...,
+ "docText":  ...,}
+</code></pre>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span> <span class="p">\\</span> <span class="p">[],</span> <span class="n">docText</span> <span class="p">\\</span> <span class="p">[],</span> <span class="n">codeText</span> <span class="p">\\</span> <span class="p">[],</span> <span class="n">multiLine</span> <span class="p">\\</span> <span class="no">false</span><span class="p">,</span> <span class="n">hasCode</span> <span class="p">\\</span> <span class="no">false</span><span class="p">,</span> <span class="n">nbLeadSpaces</span> <span class="p">\\</span> <span class="m">0</span><span class="p">)</span>
+
+  <span class="k">defp</span> <span class="n">parse</span><span class="p">(</span><span class="n">_lang</span><span class="p">,</span> <span class="p">[],</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">_multiLine</span><span class="p">,</span> <span class="n">_hasCode</span><span class="p">,</span> <span class="n">_nbLeadSpaces</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span> <span class="n">save_section</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="k">defp</span> <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="p">[</span><span class="n">line</span><span class="o">|</span><span class="n">lines</span><span class="p">],</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">multiLineDelimiters</span> <span class="o">=</span> <span class="p">[</span><span class="n">lang</span><span class="o">.</span><span class="n">multistart</span><span class="p">,</span> <span class="n">lang</span><span class="o">.</span><span class="n">multiend</span><span class="p">]</span>
+    <span class="k">cond</span> <span class="k">do</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-10 -->
+<li id="section-11 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-11">&#182;</a>
+</div>
+<p>Ignore the beginning line of executable scripts (i.e line containing shebang).</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>      <span class="no">String</span><span class="o">.</span><span class="n">starts_with?</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">!&quot;</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span>
+
+      <span class="n">has_multi_line_delim?</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">multiLineDelimiters</span><span class="p">)</span> <span class="o">-&gt;</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-11 -->
+<li id="section-12 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-12">&#182;</a>
+</div>
+<p>Start multiline parsing if a start delimiter is detected.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="k">unless</span> <span class="n">multiLine</span> <span class="k">do</span>
+<span class="k">          </span><span class="n">multiLine</span> <span class="o">=</span> <span class="no">true</span>
+        <span class="k">end</span>
+
+        <span class="p">[</span><span class="n">leadSpaces</span><span class="p">]</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="err">~</span><span class="n">r</span><span class="o">/</span><span class="p">\</span><span class="n">s</span><span class="o">*/</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">nbLeadSpaces</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">leadSpaces</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-12 -->
+<li id="section-13 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-13">&#182;</a>
+</div>
+<p>Stop multiline parsing when an end delimiter is detected.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="k">if</span> <span class="n">multiLine</span>
+        <span class="o">&amp;&amp;</span> <span class="no">String</span><span class="o">.</span><span class="n">ends_with?</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">lang</span><span class="o">.</span><span class="n">multiend</span><span class="p">)</span>
+        <span class="o">&amp;&amp;</span> <span class="no">String</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="no">String</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">multiend</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">          </span><span class="n">multiLine</span> <span class="o">=</span> <span class="no">false</span>
+        <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-13 -->
+<li id="section-14 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-14">&#182;</a>
+</div>
+<p>Remove single line comment delimiters from comment blocks so they do not appear in the final docs.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="n">line</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">lang</span><span class="o">.</span><span class="n">multistart</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">multiend</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">strip</span>
+
+        <span class="k">if</span> <span class="no">String</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="m">0</span> <span class="k">do</span>
+<span class="k">          </span><span class="n">docText</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">|</span> <span class="n">docText</span><span class="p">]</span>
+        <span class="k">end</span>
+
+        <span class="k">if</span> <span class="o">!</span><span class="n">multiLine</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="no">Enum</span><span class="o">.</span><span class="n">empty?</span><span class="p">(</span><span class="n">docText</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">          </span><span class="n">sections</span> <span class="o">=</span> <span class="n">save_section</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">)</span>
+          <span class="n">docText</span> <span class="o">=</span> <span class="n">codeText</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">end</span>
+        <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-14 -->
+<li id="section-15 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-15">&#182;</a>
+</div>
+<p>Parse comment block between multiline delimiters.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="n">multiLine</span> <span class="o">-&gt;</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">compile!</span><span class="p">(</span><span class="s2">&quot;\s{</span><span class="si">#{</span><span class="n">nbLeadSpaces</span><span class="si">}</span><span class="s2">}&quot;</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">Regex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="ss">global:</span> <span class="no">false</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">rstrip</span>
+        <span class="n">docText</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">|</span> <span class="n">docText</span><span class="p">]</span>
+        <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-15 -->
+<li id="section-16 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-16">&#182;</a>
+</div>
+<p>Parse single line comments.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>      <span class="no">Regex</span><span class="o">.</span><span class="n">match?</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">commentMatcher</span><span class="p">,</span> <span class="no">String</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">line</span><span class="p">))</span> <span class="o">-&gt;</span>
+        <span class="k">if</span> <span class="n">hasCode</span> <span class="k">do</span>
+<span class="k">          </span><span class="n">sections</span> <span class="o">=</span> <span class="n">save_section</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">)</span>
+          <span class="n">hasCode</span> <span class="o">=</span> <span class="no">false</span>
+          <span class="n">docText</span> <span class="o">=</span> <span class="n">codeText</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">end</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">commentMatcher</span><span class="p">,</span> <span class="no">String</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">rstrip</span>
+        <span class="n">docText</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">|</span> <span class="n">docText</span><span class="p">]</span>
+        <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-16 -->
+<li id="section-17 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-17">&#182;</a>
+</div>
+<p>Consider everything else as code.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="no">true</span> <span class="o">-&gt;</span>  <span class="n">hasCode</span> <span class="o">=</span> <span class="no">true</span>
+        <span class="n">codeText</span> <span class="o">=</span> <span class="p">[</span> <span class="no">String</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">|</span> <span class="n">codeText</span> <span class="p">]</span>
+        <span class="n">parse</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">docText</span><span class="p">,</span> <span class="n">codeText</span><span class="p">,</span> <span class="n">multiLine</span><span class="p">,</span> <span class="n">hasCode</span><span class="p">,</span> <span class="n">nbLeadSpaces</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#parse</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-17 -->
+<li id="section-18 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-18">&#182;</a>
+</div>
+<h2>Processing sections</h2>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-18 -->
+<li id="section-19 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-19">&#182;</a>
+</div>
+<p>Highlight code and convert markdown text to html.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">process_sections</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">sections</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">markdownTask</span> <span class="o">=</span> <span class="no">Task</span><span class="o">.</span><span class="n">async</span><span class="p">(</span><span class="k">fn</span> <span class="o">-&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="k">fn</span> <span class="n">section</span> <span class="o">-&gt;</span> <span class="n">markdown</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">docText</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="n">for</span> <span class="n">section</span> <span class="o">&lt;-</span> <span class="n">sections</span><span class="p">,</span> <span class="ss">into:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">do</span><span class="p">:</span> <span class="n">section</span><span class="o">.</span><span class="n">codeText</span> <span class="o">&lt;&gt;</span> <span class="n">lang</span><span class="o">.</span><span class="n">dividerText</span>
+    <span class="n">pygmentTask</span> <span class="o">=</span> <span class="no">Task</span><span class="o">.</span><span class="n">async</span><span class="p">(</span><span class="k">fn</span> <span class="o">-&gt;</span> <span class="n">pygmentize</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+
+    <span class="n">docSections</span> <span class="o">=</span> <span class="no">Task</span><span class="o">.</span><span class="n">await</span><span class="p">(</span><span class="n">markdownTask</span><span class="p">)</span>
+
+    <span class="n">codeHtml</span> <span class="o">=</span> <span class="no">Task</span><span class="o">.</span><span class="n">await</span><span class="p">(</span><span class="n">pygmentTask</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mHighlightStart</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mHighlightEnd</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">codeFragments</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">lang</span><span class="o">.</span><span class="n">dividerHtml</span><span class="p">,</span> <span class="n">codeHtml</span><span class="p">)</span>
+                    <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">fn</span> <span class="n">codeFragment</span> <span class="o">-&gt;</span>
+                    <span class="k">cond</span> <span class="k">do</span>
+<span class="k">                      </span><span class="no">String</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">codeFragment</span><span class="p">)</span> <span class="o">&gt;</span> <span class="m">0</span> <span class="o">-&gt;</span> <span class="n">mHighlightStart</span> <span class="o">&lt;&gt;</span> <span class="n">codeFragment</span> <span class="o">&lt;&gt;</span> <span class="n">mHighlightEnd</span>
+                      <span class="no">true</span> <span class="o">-&gt;</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">end</span>
+                    <span class="k">end</span><span class="p">)</span>
+
+    <span class="no">List</span><span class="o">.</span><span class="n">zip</span><span class="p">([</span><span class="n">docSections</span><span class="p">,</span> <span class="n">codeFragments</span><span class="p">])</span>
+  <span class="k">end</span> <span class="c1">#process_sections</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-19 -->
+<li id="section-20 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-20">&#182;</a>
+</div>
+<h2>Helper functions</h2>
+</div> <!-- end annotation -->
+<div class="content"></div><!-- end content -->
+</li> <!-- end #section-20 -->
+<li id="section-21 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-21">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">read_source</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="n">content</span><span class="p">}</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="no">String</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="err">~</span><span class="n">r</span><span class="o">/</span><span class="p">\</span><span class="n">n</span><span class="o">/</span><span class="p">)</span>
+  <span class="k">end</span> <span class="c1">#read_source</span>
+
+  <span class="k">defp</span> <span class="n">has_multi_line_delim?</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">multiLineDelimiters</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="no">Enum</span><span class="o">.</span><span class="n">all?</span><span class="p">(</span><span class="n">multiLineDelimiters</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">any?</span><span class="p">(</span><span class="n">for</span> <span class="n">delim</span> <span class="o">&lt;-</span> <span class="n">multiLineDelimiters</span><span class="p">,</span> <span class="k">do</span><span class="p">:</span> <span class="no">String</span><span class="o">.</span><span class="n">starts_with?</span><span class="p">(</span><span class="no">String</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">delim</span><span class="p">)</span> <span class="o">||</span> <span class="no">String</span><span class="o">.</span><span class="n">ends_with?</span><span class="p">(</span><span class="no">String</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">delim</span><span class="p">))</span>
+  <span class="k">end</span> <span class="c1">#has_multi_line_delim?</span>
+
+  <span class="k">defp</span> <span class="n">render_template</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">cssPath</span><span class="p">,</span> <span class="n">processedSections</span><span class="p">,</span> <span class="n">dropdownLinks</span><span class="p">,</span> <span class="n">scriptLinks</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">header</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="no">Resources</span><span class="o">.</span><span class="n">htmlHeader</span><span class="p">,</span> <span class="s2">&quot;{{title}}&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+              <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{{css}}&quot;</span><span class="p">,</span> <span class="n">cssPath</span><span class="p">)</span>
+              <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{{navigation}}&quot;</span><span class="p">,</span> <span class="n">dropdownLinks</span><span class="p">)</span>
+
+    <span class="n">body</span> <span class="o">=</span> <span class="no">Enum</span><span class="o">.</span><span class="n">with_index</span><span class="p">(</span><span class="n">processedSections</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">List</span><span class="o">.</span><span class="n">foldl</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">fn</span><span class="p">({{</span><span class="n">docHtml</span><span class="p">,</span> <span class="n">codeHtml</span><span class="p">},</span> <span class="n">index</span><span class="p">},</span> <span class="n">acc</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="no">Resources</span><span class="o">.</span><span class="n">htmlBody</span><span class="p">,</span> <span class="s2">&quot;{{index}}&quot;</span><span class="p">,</span> <span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{{docs}}&quot;</span><span class="p">,</span> <span class="n">docHtml</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{{code}}&quot;</span><span class="p">,</span> <span class="n">codeHtml</span><span class="p">)</span>
+    <span class="n">acc</span> <span class="o">&lt;&gt;</span> <span class="n">template</span>
+    <span class="k">end</span><span class="p">)</span>
+
+    <span class="n">footer</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="no">Resources</span><span class="o">.</span><span class="n">htmlFooter</span><span class="p">,</span> <span class="s2">&quot;{{scripts}}&quot;</span><span class="p">,</span> <span class="n">scriptLinks</span><span class="p">)</span>
+
+    <span class="n">header</span> <span class="o">&lt;&gt;</span> <span class="n">body</span> <span class="o">&lt;&gt;</span> <span class="n">footer</span>
+  <span class="k">end</span> <span class="c1">#render_template</span>
+
+  <span class="k">defp</span> <span class="n">save_section</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">docs</span> <span class="o">=</span> <span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">)</span>
+    <span class="p">[</span> <span class="err">%</span><span class="no">Section</span><span class="p">{</span><span class="ss">docText:</span> <span class="n">docs</span><span class="p">,</span> <span class="ss">codeText:</span> <span class="n">code</span> <span class="p">}</span><span class="o">|</span> <span class="n">sections</span> <span class="p">]</span>
+  <span class="k">end</span> <span class="c1">#save_section</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-21 -->
+<li id="section-22 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-22">&#182;</a>
+</div>
+<p>Creates a directory if it doesn't already exist.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">ensure_directory</span><span class="p">(</span><span class="n">dir</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">mkdir_p!</span> <span class="n">dir</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-22 -->
+<li id="section-23 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-23">&#182;</a>
+</div>
+<p>Remove special characters from a string to make it URL and filename safe.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">sanitize_filename</span><span class="p">(</span><span class="n">string</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Regex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="err">~</span><span class="n">r</span><span class="o">/</span><span class="p">[</span><span class="o">^</span><span class="n">a</span><span class="o">-</span><span class="n">z0</span><span class="o">-</span><span class="m">9</span><span class="p">]</span><span class="o">/</span><span class="p">,</span> <span class="no">String</span><span class="o">.</span><span class="n">downcase</span><span class="p">(</span><span class="n">string</span><span class="p">),</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+
+  <span class="k">defp</span> <span class="n">sanitize_dirpath</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="no">Path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">fn</span> <span class="n">x</span> <span class="o">-&gt;</span>  <span class="o">!</span> <span class="no">Enum</span><span class="o">.</span><span class="n">member?</span><span class="p">([</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">end</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-23 -->
+<li id="section-24 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-24">&#182;</a>
+</div>
+<p>Build the documentation file name from the output directory path and the source file name.</p>
+
+<p>Example: the documentation of <code>lib/example.ex</code> will be in <code>docs/example.ex.html</code></p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">destination</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">filename</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">rootname</span>
+                <span class="o">|&gt;</span> <span class="n">sanitize_filename</span>
+    <span class="k">if</span> <span class="n">preservePaths</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">filename</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                  <span class="o">|&gt;</span> <span class="n">sanitize_dirpath</span>
+                  <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">extname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">filename</span><span class="si">}#{</span><span class="n">extension</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+  <span class="k">end</span> <span class="c1">#destination</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-24 -->
+<li id="section-25 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-25">&#182;</a>
+</div>
+<p>Build list of dropdown menu entries.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">build_nav_entries</span><span class="p">(</span><span class="n">fileList</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">,</span>  <span class="n">acc</span> <span class="p">\\</span> <span class="p">[])</span>
+
+  <span class="k">defp</span> <span class="n">build_nav_entries</span><span class="p">([],</span> <span class="n">_output</span><span class="p">,</span> <span class="n">_preservePaths</span><span class="p">,</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">List</span><span class="o">.</span><span class="n">keysort</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+  <span class="k">defp</span> <span class="n">build_nav_entries</span><span class="p">([</span><span class="n">filename</span><span class="o">|</span><span class="n">fileList</span><span class="p">],</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">basename</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">basename</span> <span class="n">filename</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">destination</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">)</span>
+    <span class="n">build_nav_entries</span><span class="p">(</span><span class="n">fileList</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">preservePaths</span><span class="p">,</span> <span class="p">[{</span><span class="n">basename</span><span class="p">,</span> <span class="n">url</span><span class="p">}</span><span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">end</span> <span class="c1">#build_nav_entries</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-25 -->
+<li id="section-26 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-26">&#182;</a>
+</div>
+<p>Render the dropdown menu entries.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">render_nav_links</span><span class="p">(</span><span class="n">links</span><span class="p">,</span> <span class="n">acc</span> <span class="p">\\</span> <span class="p">[])</span>
+
+  <span class="k">defp</span> <span class="n">render_nav_links</span><span class="p">([],</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="no">Resources</span><span class="o">.</span><span class="n">htmlJumpBegin</span> <span class="o">&lt;&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span> <span class="o">&lt;&gt;</span> <span class="no">Resources</span><span class="o">.</span><span class="n">htmlJumpEnd</span>
+  <span class="k">end</span>
+  <span class="k">defp</span> <span class="n">render_nav_links</span><span class="p">([{</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="p">}</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">jumpEntry</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="no">Resources</span><span class="o">.</span><span class="n">htmlJumpLink</span><span class="p">,</span> <span class="s2">&quot;{{url}}&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{{filename}}&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">render_nav_links</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[</span><span class="n">jumpEntry</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">end</span> <span class="c1">#render_nav_links</span>
+
+  <span class="k">defp</span> <span class="n">render_js_scripts</span><span class="p">(</span><span class="n">fileList</span><span class="p">,</span> <span class="n">acc</span> <span class="p">\\</span> <span class="p">[])</span>
+
+  <span class="k">defp</span> <span class="n">render_js_scripts</span><span class="p">([],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Enum</span><span class="o">.</span><span class="n">join</span>
+  <span class="k">defp</span> <span class="n">render_js_scripts</span><span class="p">([</span><span class="n">path</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">jsLink</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="no">Resources</span><span class="o">.</span><span class="n">jsLink</span><span class="p">,</span> <span class="s2">&quot;{{js}}&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">render_js_scripts</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[</span><span class="n">jsLink</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">end</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-26 -->
+<li id="section-27 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-27">&#182;</a>
+</div>
+<p>If at least two files are processes simultaneously, they will keep a reference to each other in a navigation menu.
+This reference is a relative path from <code>file A</code> to <code>file B</code> taking <code>file A</code>'s parent directory as the starting point.</p>
+
+<p>For example to access the file <code>docs/exocco.css</code>, <code>docs/lib/priv/file.html</code> will have the relative path <code>./../../exocco.css</code>.</p>
+
+<p>The function <code>relative_to</code> will dynamically determine the correct references for each submitted file.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">fromfile</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">dir</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">split</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fromfile</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">split</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="no">Path</span><span class="o">.</span><span class="n">basename</span> <span class="n">filepath</span>
+    <span class="n">relative_to</span><span class="p">(</span><span class="n">dir</span><span class="p">,</span> <span class="n">cwd</span><span class="p">,</span> <span class="p">[])</span> <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+  <span class="k">end</span> <span class="c1">#relative_to</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="p">[</span><span class="n">_last</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="p">[],</span> <span class="p">[</span><span class="s2">&quot;..&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="p">[</span><span class="n">_first</span><span class="o">|</span><span class="n">rest</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="n">rest</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;..&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="p">[],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="p">[],</span> <span class="p">[</span><span class="n">head</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="p">[</span><span class="n">_last</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[</span><span class="s2">&quot;..&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="p">[</span><span class="n">head</span><span class="o">|</span><span class="n">rest</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([],</span> <span class="n">rest</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="p">[</span><span class="n">_first</span><span class="o">|</span><span class="n">rest</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="p">],</span> <span class="n">rest</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;..&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">head</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[</span><span class="n">head</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[</span><span class="n">_last</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[</span><span class="s2">&quot;..&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[</span><span class="n">head</span><span class="o">|</span><span class="n">rest</span><span class="p">],</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">relative_to</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+  <span class="k">defp</span> <span class="n">relative_to</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="p">[</span><span class="n">_first</span><span class="o">|</span><span class="n">_rest</span><span class="p">],</span> <span class="n">_acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">head</span><span class="o">|</span><span class="n">next</span><span class="p">])</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-27 -->
+<li id="section-28 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-28">&#182;</a>
+</div>
+<p>Invert the comment and code relationship on a per-line basis for files written in literate
+programming style.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span> <span class="p">\\</span> <span class="no">false</span><span class="p">,</span> <span class="n">maybeCode</span> <span class="p">\\</span> <span class="no">true</span><span class="p">,</span> <span class="n">acc</span> <span class="p">\\</span> <span class="p">[])</span>
+
+  <span class="k">defp</span> <span class="n">preprocess_literate</span><span class="p">([],</span> <span class="n">_lang</span><span class="p">,</span> <span class="n">_isText</span><span class="p">,</span> <span class="n">_maybeCode</span><span class="p">,</span> <span class="n">acc</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="no">Enum</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+  <span class="k">defp</span> <span class="n">preprocess_literate</span><span class="p">([</span><span class="n">line</span><span class="o">|</span><span class="n">next</span><span class="p">],</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span><span class="p">,</span> <span class="n">maybeCode</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">  </span><span class="n">match</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="err">~</span><span class="n">r</span><span class="o">/^</span><span class="p">([</span>  <span class="p">]{</span><span class="m">4</span><span class="p">}</span><span class="o">|</span><span class="p">[</span>  <span class="p">]{</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">}\</span><span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+  <span class="k">cond</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">maybeCode</span> <span class="o">&amp;&amp;</span> <span class="n">match</span> <span class="o">-&gt;</span>
+      <span class="n">isText</span> <span class="o">=</span> <span class="no">false</span>
+      <span class="n">nbLeadSpaces</span> <span class="o">=</span> <span class="no">List</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="n">match</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">length</span>
+      <span class="n">line</span> <span class="o">=</span> <span class="no">Regex</span><span class="o">.</span><span class="n">compile!</span><span class="p">(</span><span class="s2">&quot;\s{</span><span class="si">#{</span><span class="n">nbLeadSpaces</span><span class="si">}</span><span class="s2">}&quot;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">Regex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="ss">global:</span> <span class="no">false</span><span class="p">)</span>
+      <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span><span class="p">,</span> <span class="n">maybeCode</span><span class="p">,</span> <span class="p">[</span><span class="n">line</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+
+        <span class="no">Regex</span><span class="o">.</span><span class="n">match?</span><span class="p">(</span><span class="err">~</span><span class="n">r</span><span class="o">/^</span><span class="p">\</span><span class="n">s</span><span class="o">*</span><span class="err">$</span><span class="o">/</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="o">-&gt;</span>
+          <span class="n">maybeCode</span> <span class="o">=</span> <span class="no">true</span>
+          <span class="k">cond</span> <span class="k">do</span>
+<span class="k">            </span><span class="n">isText</span> <span class="o">-&gt;</span> <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span><span class="p">,</span> <span class="n">maybeCode</span><span class="p">,</span> <span class="p">[</span><span class="n">lang</span><span class="o">.</span><span class="n">symbol</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+            <span class="no">true</span> <span class="o">-&gt;</span> <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span><span class="p">,</span> <span class="n">maybeCode</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;&quot;</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+          <span class="k">end</span>
+
+          <span class="no">true</span> <span class="o">-&gt;</span> <span class="n">isText</span> <span class="o">=</span> <span class="no">true</span>
+          <span class="n">maybeCode</span> <span class="o">=</span> <span class="no">false</span>
+          <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">lang</span><span class="o">.</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="n">preprocess_literate</span><span class="p">(</span><span class="n">next</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">isText</span><span class="p">,</span> <span class="n">maybeCode</span><span class="p">,</span> <span class="p">[</span><span class="n">line</span> <span class="o">|</span> <span class="n">acc</span><span class="p">])</span>
+      <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#preprocess_literate</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-28 -->
+<li id="section-29 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-29">&#182;</a>
+</div>
+<p>Convert markdown text to html.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">markdown</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="k">do</span><span class="p">:</span> <span class="n">to_char_list</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="ss">:markdown</span><span class="o">.</span><span class="n">conv</span> <span class="o">|&gt;</span> <span class="n">to_string</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-29 -->
+<li id="section-30 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-30">&#182;</a>
+</div>
+<p>Test if Pygments is installed locally.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">has_pygmentize?</span><span class="p">(),</span> <span class="k">do</span><span class="p">:</span> <span class="no">System</span><span class="o">.</span><span class="n">find_executable</span><span class="p">(</span><span class="n">mPygmentize</span><span class="p">)</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-30 -->
+<li id="section-31 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-31">&#182;</a>
+</div>
+<p>Use <strong>Pygments</strong> to highlight the source code.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">pygmentize</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    if</span> <span class="n">has_pygmentize?</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">pygmentize_local</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="no">IO</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;Warning: Pygments not installed. Using webservice.&quot;</span>
+      <span class="n">pygmentize_web</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#pygmentize</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-31 -->
+<li id="section-32 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-32">&#182;</a>
+</div>
+<p>Use the local <strong>Pygments</strong> command line tool to highlight the code.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">pygmentize_local</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">tmpFile</span> <span class="o">=</span> <span class="n">new_tmp_file</span>
+    <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmpFile</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+    <span class="n">codeHighlighted</span> <span class="o">=</span> <span class="ss">:os</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="no">String</span><span class="o">.</span><span class="n">to_char_list</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">mPygmentize</span><span class="si">}</span><span class="s2"> -l </span><span class="si">#{</span><span class="n">lang</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> -O bg=dark,encoding=utf-8 -f html </span><span class="si">#{</span><span class="n">tmpFile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="ss">:ok</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">rm</span> <span class="n">tmpFile</span>
+    <span class="n">to_string</span> <span class="n">codeHighlighted</span>
+  <span class="k">end</span> <span class="c1">#pygmentize_local</span>
+
+  <span class="k">defp</span> <span class="n">new_tmp_file</span> <span class="k">do</span>
+<span class="k">    </span><span class="p">{</span><span class="n">mgSecs</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">micSecs</span><span class="p">}</span><span class="o">=</span> <span class="ss">:erlang</span><span class="o">.</span><span class="n">now</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;tmpExocco</span><span class="si">#{</span><span class="n">mgSecs</span><span class="si">}#{</span><span class="n">secs</span><span class="si">}#{</span><span class="n">micSecs</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="no">Path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">System</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+  <span class="k">end</span> <span class="c1">#new_tmp_file</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-32 -->
+<li id="section-33 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-33">&#182;</a>
+</div>
+<p>Send the code to highlight to <strong>Pygments</strong> webservice.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defp</span> <span class="n">pygmentize_web</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">    </span><span class="ss">:inets</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">case</span> <span class="n">resolve_proxy</span> <span class="k">do</span>
+<span class="k">      </span><span class="p">{</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="ss">:httpc</span><span class="o">.</span><span class="n">set_options</span><span class="p">([{</span><span class="ss">:proxy</span><span class="p">,</span> <span class="p">{{</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">},</span> <span class="p">[]</span> <span class="p">}}])</span>
+      <span class="n">_</span> <span class="o">-&gt;</span> <span class="ss">:ok</span>
+    <span class="k">end</span>
+    <span class="n">request_body</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">encode_query</span><span class="p">(</span><span class="err">%</span><span class="p">{</span><span class="s2">&quot;lang&quot;</span> <span class="o">=&gt;</span> <span class="n">lang</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span> <span class="o">=&gt;</span> <span class="n">code</span><span class="p">})</span>
+    <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="p">{</span><span class="n">_statusLine</span><span class="p">,</span> <span class="n">_headers</span><span class="p">,</span> <span class="n">body</span><span class="p">}}</span> <span class="o">=</span> <span class="ss">:httpc</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="p">{</span><span class="n">mPygmentizeUrl</span><span class="p">,</span> <span class="p">[],</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">,</span> <span class="n">request_body</span><span class="p">},</span> <span class="p">[],</span> <span class="p">[])</span>
+    <span class="ss">:inets</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    <span class="n">to_string</span> <span class="n">body</span>
+  <span class="k">end</span> <span class="c1">#pygmentize_web</span>
+
+  <span class="k">defp</span> <span class="n">resolve_proxy</span> <span class="k">do</span>
+<span class="k">    </span><span class="n">proxy</span> <span class="o">=</span> <span class="no">System</span><span class="o">.</span><span class="n">get_env</span><span class="p">(</span><span class="s2">&quot;http_proxy&quot;</span><span class="p">)</span>
+    <span class="k">cond</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">proxy</span> <span class="o">-&gt;</span>
+      <span class="k">case</span> <span class="no">Regex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="err">~</span><span class="n">r</span><span class="o">/</span><span class="p">\</span><span class="o">/</span><span class="p">\</span><span class="o">/|</span><span class="ss">:|</span><span class="err">@</span><span class="o">/</span><span class="p">,</span> <span class="n">proxy</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">        </span><span class="p">[</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">host</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="no">String</span><span class="o">.</span><span class="n">to_char_list</span><span class="p">(</span><span class="n">host</span><span class="p">),</span> <span class="m">80</span> <span class="p">}</span>
+        <span class="p">[</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="no">String</span><span class="o">.</span><span class="n">to_char_list</span><span class="p">(</span><span class="n">host</span><span class="p">),</span> <span class="no">String</span><span class="o">.</span><span class="n">to_integer</span><span class="p">(</span><span class="n">port</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">[</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">host</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="no">String</span><span class="o">.</span><span class="n">to_char_list</span><span class="p">(</span><span class="n">host</span><span class="p">),</span> <span class="m">80</span> <span class="p">}</span>
+        <span class="p">[</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="no">String</span><span class="o">.</span><span class="n">to_char_list</span><span class="p">(</span><span class="n">host</span><span class="p">),</span> <span class="no">String</span><span class="o">.</span><span class="n">to_integer</span><span class="p">(</span><span class="n">port</span><span class="p">)</span> <span class="p">}</span>
+      <span class="k">end</span>
+
+      <span class="no">true</span> <span class="o">-&gt;</span> <span class="no">nil</span>
+    <span class="k">end</span>
+  <span class="k">end</span> <span class="c1">#resolve_proxy</span>
+<span class="k">end</span> <span class="c1">#defmodule Exocco</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-33 -->
+</ul> <!-- end sections -->
+</content>
+</page>
+<script type="text/javascript" src="./../tmp/jquery.min.js"></script><script type="text/javascript" src="./../tmp/dropdown.js"></script>
+</body>
+</html>

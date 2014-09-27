@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>language.ex</title>
+<link rel="stylesheet" href="././../../exocco.css" type="text/css" media="screen"/>
+</head>
+<body>
+<page>
+<nav role="navigation">
+<ul class="menu">
+<li class="dropdown">
+<a href="javascript:void(0);"><span class="large">Jump To&hellip;</span><span class="small">+</span></a>
+<ul class="dropdown-menu" role="menu">
+<li><a href="./././../fixture_files/exocco.ex.html">exocco.ex</a></li><li><a href="./././../fixture_files/language.ex.html">language.ex</a></li></ul><!-- end dropdown-menu -->
+</li><!-- end dropdown -->
+</ul><!-- end menu -->
+</nav>
+
+<content>
+<ul class="sections"> 
+<li id="title">
+<div class="annotation"> 
+<h1>language.ex</h1>
+</div>
+</li><!-- end #title -->
+<li id="section-0 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-0">&#182;</a>
+</div>
+
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre><span class="k">defmodule</span> <span class="no">Language</span> <span class="k">do</span>
+
+<span class="k">  </span><span class="n">defstruct</span> <span class="ss">name:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="ss">literate:</span> <span class="no">false</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="no">nil</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="no">nil</span><span class="p">,</span>
+  <span class="ss">commentMatcher:</span> <span class="no">nil</span><span class="p">,</span> <span class="ss">dividerText:</span> <span class="no">nil</span><span class="p">,</span> <span class="ss">dividerHtml:</span> <span class="no">nil</span>
+
+  <span class="nv">@type</span> <span class="n">t</span> <span class="p">::</span> <span class="err">%</span><span class="no">Language</span><span class="p">{</span> <span class="ss">name:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">literate:</span> <span class="n">boolean</span><span class="p">,</span>
+    <span class="ss">multistart:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">commentMatcher:</span> <span class="no">Regex</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
+    <span class="ss">dividerText:</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="ss">dividerHtml:</span> <span class="no">Regex</span><span class="o">.</span><span class="n">t</span><span class="p">}</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-0 -->
+<li id="section-1 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-1">&#182;</a>
+</div>
+<p>List of languages supported by Exocco.</p>
+
+<p>To support a new language,
+map a file extension to the name of its Pygments lexer following the same syntax.
+Then rebuild the project.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>  <span class="k">defmacrop</span> <span class="n">mLanguages</span> <span class="k">do</span>
+<span class="k">    </span><span class="kn">quote</span> <span class="k">do</span>
+<span class="k">      </span><span class="n">languages</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;.applescript&quot;</span><span class="p">:</span> <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;applescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.as&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;actionscript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.bat&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;dos&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;@?rem&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.btm&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;dos&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;@?rem&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.c&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;/*&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;*/&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.clj&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;clojure&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cls&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;tex&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cmake&quot;</span><span class="p">:</span>       <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;cmake&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cmd&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;dos&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;@?rem&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.coffee&quot;</span><span class="p">:</span>      <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;coffeescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cpp&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;cpp&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;/*&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;*/&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cs&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;cs&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.cson&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;coffeescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.d&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.dtx&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;tex&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.erl&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;erlang&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.eex&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;elixir&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.ex&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;elixir&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.exs&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;elixir&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.frag&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;glsl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.glsl&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;glsl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.go&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.groovy&quot;</span><span class="p">:</span>      <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;groovy&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.h&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;/*&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;*/&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.hrl&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;erlang&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.hs&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;haskell&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;{-&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;-}&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.ini&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;ini&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.js&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;javascript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;/*&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;*/&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.java&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;java&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;/*&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;*/&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.latex&quot;</span><span class="p">:</span>       <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;tex&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.less&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;less&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.lisp&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;lisp&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.litcoffee&quot;</span><span class="p">:</span>   <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;coffeescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ss">literate:</span> <span class="no">true</span><span class="p">},</span>
+        <span class="s2">&quot;.ls&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;coffeescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.lua&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;lua&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;--[[&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;]]--&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.n&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;nemerle&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.m&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;objectivec&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.mel&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;mel&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.markdown&quot;</span><span class="p">:</span>    <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;markdown&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.md&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;markdown&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.mm&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;objectivec&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.p&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;delphi&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.pas&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;delphi&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.php&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;php&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.pl&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;perl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.pm&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;perl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.pod&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;perl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.pp&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;delphi&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.py&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.rb&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;ruby&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;=begin&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;=end&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.tex&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;tex&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.scala&quot;</span><span class="p">:</span>       <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;scala&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.scm&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;scheme&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;;;&quot;</span><span class="p">,</span> <span class="ss">multistart:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">|&quot;</span><span class="p">,</span> <span class="ss">multiend:</span> <span class="s2">&quot;|</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.scpt&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;applescript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.scss&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;scss&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.sh&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.sql&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;sql&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.sty&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;tex&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;%&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.t&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;perl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vala&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vala&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vapi&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vala&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vbe&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vbscript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vbs&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vbscript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vert&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;glsl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.vhdl&quot;</span><span class="p">:</span>        <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vhdl&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;--&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.r&quot;</span><span class="p">:</span>           <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;</span><span class="err">#</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.rc&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;rust&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.rs&quot;</span><span class="p">:</span>          <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;rust&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;//&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.wsc&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vbscript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;.wsf&quot;</span><span class="p">:</span>         <span class="err">%</span><span class="no">Language</span><span class="p">{</span><span class="ss">name:</span> <span class="s2">&quot;vbscript&quot;</span><span class="p">,</span> <span class="ss">symbol:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">}</span>
+      <span class="p">]</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-1 -->
+<li id="section-2 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-2">&#182;</a>
+</div>
+<p>Build out the appropriate matchers and delimiters for each language.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>    <span class="n">for</span> <span class="p">{</span> <span class="n">ext</span><span class="p">,</span><span class="n">lang</span> <span class="p">}</span> <span class="o">&lt;-</span> <span class="n">languages</span><span class="p">,</span> <span class="k">do</span><span class="p">:</span> <span class="p">{</span> <span class="n">ext</span><span class="p">,</span>  <span class="err">%</span><span class="no">Language</span><span class="p">{</span> <span class="n">lang</span><span class="o">|</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-2 -->
+<li id="section-3 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-3">&#182;</a>
+</div>
+<p>Regex to test if a line starts with a comment symbol.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="ss">commentMatcher:</span> <span class="no">Regex</span><span class="o">.</span><span class="n">compile!</span><span class="p">(</span><span class="s2">&quot;^\s*</span><span class="si">#{</span><span class="n">lang</span><span class="o">.</span><span class="n">symbol</span><span class="si">}</span><span class="s2">+\s?&quot;</span> <span class="p">),</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-3 -->
+<li id="section-4 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-4">&#182;</a>
+</div>
+<p>The dividing token we feed into Pygments, to delimit the boundaries between
+sections.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="ss">dividerText:</span> <span class="s2">&quot;\n</span><span class="si">#{</span><span class="n">lang</span><span class="o">.</span><span class="n">symbol</span><span class="si">}</span><span class="s2">DIVIDER\n&quot;</span><span class="p">,</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-4 -->
+<li id="section-5 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-5">&#182;</a>
+</div>
+<p>The mirror of <code>dividerText</code> that we expect Pygments to return. We can split
+on this to recover the original sections.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre>        <span class="ss">dividerHtml:</span> <span class="no">Regex</span><span class="o">.</span><span class="n">compile!</span><span class="p">(</span><span class="s2">&quot;\n*&lt;span class=\&quot;</span><span class="n">c1?</span><span class="p">\</span><span class="s2">&quot;&gt;</span><span class="si">#{</span><span class="n">lang</span><span class="o">.</span><span class="n">symbol</span><span class="si">}</span><span class="s2">DIVIDER&lt;/span&gt;\n*&quot;</span><span class="p">),</span>
+      <span class="p">}</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span> <span class="c1">#defmacrop</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-5 -->
+<li id="section-6 "> 
+<div class="annotation">
+<div class="pilwrap ">
+<a class="pilcrow" href="#section-6">&#182;</a>
+</div>
+<p>Get language specifications from a file extension.</p>
+</div> <!-- end annotation -->
+<div class="content"><div class="highlight"><pre><span class="nv">@spec</span> <span class="n">from_file_ext</span><span class="p">(</span><span class="n">fileExtension</span> <span class="p">::</span> <span class="no">String</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="p">::</span> <span class="err">%</span><span class="no">Language</span><span class="p">{}</span> <span class="o">|</span> <span class="no">nil</span>
+
+<span class="k">def</span> <span class="n">from_file_ext</span><span class="p">(</span><span class="n">fileExtension</span><span class="p">)</span> <span class="k">do</span>
+<span class="k">  </span><span class="n">extension</span> <span class="o">=</span> <span class="no">String</span><span class="o">.</span><span class="n">downcase</span><span class="p">(</span><span class="n">fileExtension</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="no">String</span><span class="o">.</span><span class="n">to_atom</span>
+  <span class="n">mLanguages</span><span class="p">[</span><span class="n">extension</span><span class="p">]</span>
+<span class="k">end</span> <span class="c1">#from_file_ext</span>
+<span class="k">end</span> <span class="c1">#defmodule Language</span></pre></div></div><!-- end content -->
+</li> <!-- end #section-6 -->
+</ul> <!-- end sections -->
+</content>
+</page>
+<script type="text/javascript" src="././../../jquery.min.js"></script><script type="text/javascript" src="././../../dropdown.js"></script>
+</body>
+</html>
